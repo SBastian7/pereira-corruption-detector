@@ -9,6 +9,7 @@ from datetime import datetime
 from pathlib import Path
 import time
 import json
+import random
 
 # Endpoints públicos de SECOP II
 SECOP_BASE_URL = "https://www.colombiacompra.gov.co/secop/api/v2"
