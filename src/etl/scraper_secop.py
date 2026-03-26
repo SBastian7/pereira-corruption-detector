@@ -217,7 +217,12 @@ RealSecopScraper = SocrataSecopScraper
 SecopScraper = SocrataSecopScraper  # Alias for fallback
 
 def fetch_contracts(self, municipality="Pereira", year=2024, n=500):
-    """Alias for get_contracts_by_municipality."""
+    """Alias for get_contracts_by_municipality. Also checks for existing CSV."""
+    # Check if we have cached data
+    csv_path = self.data_dir / f"contracts_{municipality}_{year}.csv"
+    if csv_path.exists():
+        print(f"   📂 Cargando datos desde cache: {csv_path}")
+        return pd.read_csv(csv_path)
     return self.get_contracts_by_municipality(municipality, year, n)
 
 SocrataSecopScraper.fetch_contracts = fetch_contracts
