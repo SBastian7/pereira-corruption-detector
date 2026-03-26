@@ -75,6 +75,8 @@ class SocrataSecopScraper:
             
             # Filter by year if requested
             if year and not df.empty and "fecha_de_firma_del_contrato" in df.columns:
+                # Handle NaN values
+                df = df.dropna(subset=["fecha_de_firma_del_contrato"])
                 df = df[df["fecha_de_firma_del_contrato"].str.startswith(str(year))]
                 print(f"   📅 Filtrados por año {year}: {len(df)} contratos")
             
@@ -212,6 +214,7 @@ class SocrataSecopScraper:
 
 # Alias for backwards compatibility
 RealSecopScraper = SocrataSecopScraper
+SecopScraper = SocrataSecopScraper  # Alias for fallback
 
 
 if __name__ == "__main__":
