@@ -12,7 +12,7 @@ import pandas as pd
 # Add src to path
 sys.path.insert(0, str(Path(__file__).parent))
 
-from src.etl.scraper_secop import SecopScraper, RealSecopScraper
+from src.etl.scraper_secop import RealSecopScraper
 from src.etl.download_secop_data import SecopDataDownloader
 from src.features.engineering import engineer_all_features
 from src.models.anomaly.isolation_forest import CorruptionDetector
@@ -33,9 +33,9 @@ def stage_etl():
         print(f"✅ Obtenidos {len(contracts)} contratos reales")
     except Exception as e:
         print(f"⚠️ Error obteniendo datos reales: {e}")
-        print("📦 Falling back to mock data...")
+        print("📦 Generando datos mock...")
         scraper = SecopScraper()
-        contracts = scraper.fetch_contracts(municipality="Pereira", year=2024)
+        contracts = scraper.fetch_contracts(municipality="Pereira", year=2024, n=500)
     
     vendors = scraper.fetch_vendor_registry() if hasattr(scraper, 'fetch_vendor_registry') else pd.DataFrame()
     officials = scraper.fetch_officials() if hasattr(scraper, 'fetch_officials') else pd.DataFrame()
@@ -152,8 +152,8 @@ def main():
     
     elif args.stage == "network":
         # Need raw data
-        scraper = SecopScraper()
-        contracts = scraper.fetch_contracts()
+        scraper = RealSecopScraper()
+        contracts = scraper.get_contracts_by_municipality("Pereira", 2024, limit=2000)
         vendors = scraper.fetch_vendor_registry()
         officials = scraper.fetch_officials()
         contracts = engineer_all_features(contracts)

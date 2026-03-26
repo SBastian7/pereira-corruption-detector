@@ -228,6 +228,132 @@ class RealSecopScraper:
         return {"name": entity_name, "status": "unknown"}
 
 
+class SecopScraper:
+    """
+    Mock SECOP Scraper - genera datos de prueba.
+    Usa esto si no puedes obtener datos reales de SECOP.
+    """
+    
+    VENDOR_NAMES = [
+        "CONSTRUCTORA PEREIRA S.A.S.",
+        "SERVICIOS INTEGRALES LTDA",
+        "INGENIERÍA Y DISEÑO S.A.S.",
+        "CONSULTORÍA COLOMBIA S.A.",
+        "SUPPLY CHAIN SOLUTIONS S.A.S.",
+        "TECHNOLOGY PARTNERS S.A.",
+        "MULTISERVICIOS PROFESIONALES S.A.S.",
+        "ASESORÍAS Y CONSULTORÍAS DEL EJE CAFETERO",
+        "CONSTRUCCIONES Y REMODELACIONES PEREIRA",
+        "SERVICIOS ESPECIALIZADOS DE RISARALDA",
+    ]
+    
+    OFFICIAL_NAMES = [
+        "Juan Carlos Ramírez",
+        "María Elena González",
+        "Carlos Alberto López",
+        "Ana Patricia Díaz",
+        "Roberto Carlos Mendoza",
+    ]
+    
+    CONTRACT_TYPES = [
+        "seleccion_abreviada",
+        "contratacion_directa",
+        "licitacion_publica",
+        "minima_cuantia",
+        "concurso_de_mritos"
+    ]
+    
+    SUSPICIOUS_KEYWORDS = [
+        "consultoría", "asesoría", "estudios", "diseño", "interventoría",
+        "seguimiento", "evaluación", "auditoría", "soporte técnico"
+    ]
+    
+    def __init__(self, data_dir: str = "data/raw"):
+        self.data_dir = Path(data_dir)
+        self.data_dir.mkdir(parents=True, exist_ok=True)
+    
+    def fetch_contracts(self, municipality: str = "Pereira", year: int = 2024, n: int = 500) -> pd.DataFrame:
+        """Genera contratos mock con patrones realistas."""
+        import random
+        from datetime import datetime, timedelta
+        
+        random.seed(42)
+        
+        contracts = []
+        base_date = datetime(year, 1, 1)
+        
+        for i in range(n):
+            # Some contracts are suspicious
+            is_suspicious = random.random() < 0.2
+            
+            contract = {
+                "contract_id": f"CONTRATO-{year}-{i+1:05d}",
+                "title": random.choice([
+                    f"Contratación de {random.choice(self.SUSPICIOUS_KEYWORDS)} para {municipality}",
+                    f"Servicios de {random.choice(self.SUSPICIOUS_KEYWORDS)}",
+                    f"Obra pública para pavimentación calle {random.randint(1, 50)}",
+                    f"Mantenimiento de espacios públicos {municipality}",
+                ]),
+                "vendor": random.choice(self.VENDOR_NAMES),
+                "vendor_nit": f"{random.randint(800000000, 900000000)}-{random.randint(0, 9)}",
+                "entity": f"Alcaldía de {municipality}",
+                "contract_type": random.choice(self.CONTRACT_TYPES),
+                "contract_value": random.randint(10_000_000, 500_000_000),
+                "ceiling_value": 0,
+                "award_date": (base_date + timedelta(days=random.randint(0, 365))).strftime("%Y-%m-%d"),
+                "num_bidders": 1 if is_suspicious else random.randint(2, 8),
+                "modifications": random.randint(0, 5) if is_suspicious else random.randint(0, 1),
+                "municipality": municipality,
+                "year": year,
+            }
+            
+            # Set ceiling based on contract value
+            contract["ceiling_value"] = int(contract["contract_value"] * random.uniform(1.0, 1.15))
+            
+            contracts.append(contract)
+        
+        df = pd.DataFrame(contracts)
+        
+        # Save
+        df.to_csv(self.data_dir / f"contracts_{municipality}_{year}.csv", index=False)
+        
+        return df
+    
+    def fetch_vendor_registry(self) -> pd.DataFrame:
+        """Genera datos mock de vendors."""
+        import random
+        from datetime import datetime, timedelta
+        
+        vendors = []
+        base_date = datetime.now()
+        
+        for i, name in enumerate(self.VENDOR_NAMES):
+            # Some vendors are new (suspicious)
+            age_days = random.randint(30, 2000)  # 30 days to 5+ years
+            vendors.append({
+                "vendor_id": f"V{i+1}",
+                "name": name,
+                "nit": f"{random.randint(800000000, 900000000)}-{random.randint(0, 9)}",
+                "registration_date": (base_date - timedelta(days=age_days)).strftime("%Y-%m-%d"),
+                "status": "active"
+            })
+        
+        return pd.DataFrame(vendors)
+    
+    def fetch_officials(self) -> pd.DataFrame:
+        """Genera datos mock de funcionarios."""
+        officials = []
+        for i, name in enumerate(self.OFFICIAL_NAMES):
+            officials.append({
+                "official_id": f"O{i+1}",
+                "name": name,
+                "position": random.choice(["Director de Contratación", "Secretario de Infraestructura", "Gerente de Proyectos"]),
+                "entity": "Alcaldía de Pereira"
+            })
+        
+        return pd.DataFrame(officials)
+
+
 class RUESClient:
     """Cliente para el Registro Único Empresarial (RUES)."""
     
