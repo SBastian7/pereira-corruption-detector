@@ -56,13 +56,11 @@ class SocrataSecopScraper:
         dataset_id = DATASETS["integrado"]
         url = self._get_url(dataset_id)
         
+        # Build query WITHOUT year (no year column exists, filter after)
         params = {
             "$limit": limit,
             "$where": f"nombre_de_la_entidad LIKE '%{municipality.upper()}%'"
         }
-        
-        if year:
-            params["$where"] += f" AND anno_del_contrato={year}"
         
         print(f"   📥 URL: {url}")
         print(f"   📥 Query: {params['$where']}")
@@ -72,7 +70,15 @@ class SocrataSecopScraper:
         if response.status_code == 200:
             data = response.json()
             print(f"   ✅ Encontrados {len(data)} contratos")
-            return self._normalize_contracts(pd.DataFrame(data))
+            
+            df = pd.DataFrame(data)
+            
+            # Filter by year if requested
+            if year and not df.empty and "fecha_de_firma_del_contrato" in df.columns:
+                df = df[df["fecha_de_firma_del_contrato"].str.startswith(str(year))]
+                print(f"   📅 Filtrados por año {year}: {len(df)} contratos")
+            
+            return self._normalize_contracts(df)
         else:
             print(f"   ❌ Error {response.status_code}")
             print(f"   {response.text[:200]}")
