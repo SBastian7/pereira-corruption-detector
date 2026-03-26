@@ -297,6 +297,7 @@ class SecopScraper:
                 ]),
                 "vendor": random.choice(self.VENDOR_NAMES),
                 "vendor_nit": f"{random.randint(800000000, 900000000)}-{random.randint(0, 9)}",
+                "vendor_created": (base_date - timedelta(days=random.randint(30, 2000))).strftime("%Y-%m-%d"),
                 "entity": f"Alcaldía de {municipality}",
                 "contract_type": random.choice(self.CONTRACT_TYPES),
                 "contract_value": random.randint(10_000_000, 500_000_000),
