@@ -216,6 +216,12 @@ class SocrataSecopScraper:
 RealSecopScraper = SocrataSecopScraper
 SecopScraper = SocrataSecopScraper  # Alias for fallback
 
+def fetch_contracts(self, municipality="Pereira", year=2024, n=500):
+    """Alias for get_contracts_by_municipality."""
+    return self.get_contracts_by_municipality(municipality, year, n)
+
+SocrataSecopScraper.fetch_contracts = fetch_contracts
+
 
 if __name__ == "__main__":
     print("="*60)
