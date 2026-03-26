@@ -27,11 +27,11 @@ DATASETS = {
     # SECOP Integrado: contratos de SECOP I y II unificados
     "integrado": "rpmr-utcd",
     # SECOP I - Procesos de Compra Pública (histórico)
-    # "secop1": "f789-7hwg",
+    "secop1": "f789-7hwg",
     # SECOP II - Contratos Electrónicos
-    # "secop2": "jbjy-vk9h",
+    "secop2": "jbjy-vk9h",
     # SECOP II - Procesos de Contratación
-    # "secop2_procesos": "p6dx-8zbt",
+    "secop2_procesos": "p6dx-8zbt",
 }
 
 DATOS_GOV_CO_BASE = "https://www.datos.gov.co/resource"
