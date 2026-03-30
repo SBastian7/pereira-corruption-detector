@@ -22,7 +22,7 @@ from src.models.network.graph_builder import CorruptionNetwork
 @st.cache_data
 def load_data():
     """Load and process all data."""
-    scraper = SecopScraper("pereira-corruption-detector/data/raw")
+    scraper = SecopScraper("data/raw")
     contracts = scraper.fetch_contracts()
     vendors = scraper.fetch_vendor_registry()
     officials = scraper.fetch_officials()
